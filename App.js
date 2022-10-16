@@ -75,6 +75,11 @@ const App = () => {
     console.log('res', res);
     setData(res);
   };
+  let timer;
+  React.useEffect(()=>{
+    timer=setTimeout(searchMovieByLetters,4000);
+    return ()=> clearTimeout(timer);
+  },[text]);
   const searchMovieByLetters = async () => {
     console.log('text', text);
     let res = await fetch(
@@ -84,17 +89,14 @@ const App = () => {
     console.log(res.Search);
     setSearchData(res.Search);
   };
-  // eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-  const realDebounce = useCallback(debounce(searchMovieByLetters, 4000), [
-    text,
-  ]);
 
-  const SearchDataDisplay = item => {
+  const SearchDataDisplay = props => {
     return (
-      <View style={{position: 'absolute'}}>
+      <View >
+        <Text>{props.item.Title}</Text>
         <Image
-          source={{uri: item.Poster}}
-          style={{width: 200, height: 200}}
+          source={{uri: props.item.Poster}}
+          style={{width: 50, height: 50}}
           resizeMode="contain"
         />
       </View>
@@ -102,12 +104,7 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
+      <SafeAreaView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
@@ -116,12 +113,10 @@ const App = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <TextInput
-            value={text}
+            value={text} 
             onChangeText={te => {
               console.log('te', te);
-              onChangeText(te);
-              console.log('I am updated', text);
-              realDebounce();
+              onChangeText(te)
             }}
             placeholder="Enter Movie Name"
             onSubmitEditing={searchMovie}
@@ -131,15 +126,15 @@ const App = () => {
             style={{width: 400, height: 500}}
             resizeMode="contain"
           />
-          {/* <FlatList
+          <FlatList
             data={searchData}
+            style={{height:400,position:"absolute",top:50}}
             renderItem={({item}) => {
-              return <SearchDataDisplay key={item.key} item={item} />;
+              return (<SearchDataDisplay key={item.key} item={item} />);
             }}
-          /> */}
+          />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
   );
 };
 
