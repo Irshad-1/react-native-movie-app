@@ -60,9 +60,8 @@ const Section = ({children, title}) => {
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const [text, onChangeText] = React.useState('');
+  const [text, setText] = React.useState('');
   const [data, setData] = React.useState({});
-  const [searchData, setSearchData] = React.useState([]);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -75,31 +74,28 @@ const App = () => {
     console.log('res', res);
     setData(res);
   };
-  const searchMovieByLetters = async () => {
-    console.log('text', text);
-    let res = await fetch(
-      `https://www.omdbapi.com/?&apikey=c82dc22a&s=${text}`,
-    );
-    res = await res.json();
-    console.log(res.Search);
-    setSearchData(res.Search);
-  };
-  // eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-  const realDebounce = useCallback(debounce(searchMovieByLetters, 4000), [
-    text,
-  ]);
 
-  const SearchDataDisplay = item => {
-    return (
-      <View style={{position: 'absolute'}}>
-        <Image
-          source={{uri: item.Poster}}
-          style={{width: 200, height: 200}}
-          resizeMode="contain"
-        />
-      </View>
-    );
-  };
+  // const realDebounce = debounce(async () => {
+  //   console.log('text', text);
+  //   let res = await fetch(
+  //     `https://www.omdbapi.com/?&apikey=c82dc22a&s=${text}`,
+  //   );
+  //   res = await res.json();
+  //   console.log(res.Search);
+  //   setSearchData(res.Search);
+  // }, 4000);
+
+  // const SearchDataDisplay = item => {
+  //   return (
+  //     <View style={{position: 'absolute'}}>
+  //       <Image
+  //         source={{uri: item.Poster}}
+  //         style={{width: 200, height: 200}}
+  //         resizeMode="contain"
+  //       />
+  //     </View>
+  //   );
+  // };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -117,13 +113,10 @@ const App = () => {
           }}>
           <TextInput
             value={text}
-            onChangeText={te => {
-              console.log('te', te);
-              onChangeText(te);
-              console.log('I am updated', text);
-              realDebounce();
-            }}
             placeholder="Enter Movie Name"
+            onChangeText={te => {
+              setText(te);
+            }}
             onSubmitEditing={searchMovie}
           />
           <Image
