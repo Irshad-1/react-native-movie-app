@@ -74,64 +74,65 @@ const App = () => {
     console.log('res', res);
     setData(res);
   };
+  let timer;
+  React.useEffect(() => {
+    timer = setTimeout(searchMovieByLetters, 4000);
+    return () => clearTimeout(timer);
+  }, [text]);
+  const searchMovieByLetters = async () => {
+    console.log('text', text);
+    let res = await fetch(
+      `https://www.omdbapi.com/?&apikey=c82dc22a&s=${text}`,
+    );
+    res = await res.json();
+    console.log(res.Search);
+    setSearchData(res.Search);
+  };
 
-  // const realDebounce = debounce(async () => {
-  //   console.log('text', text);
-  //   let res = await fetch(
-  //     `https://www.omdbapi.com/?&apikey=c82dc22a&s=${text}`,
-  //   );
-  //   res = await res.json();
-  //   console.log(res.Search);
-  //   setSearchData(res.Search);
-  // }, 4000);
-
-  // const SearchDataDisplay = item => {
-  //   return (
-  //     <View style={{position: 'absolute'}}>
-  //       <Image
-  //         source={{uri: item.Poster}}
-  //         style={{width: 200, height: 200}}
-  //         resizeMode="contain"
-  //       />
-  //     </View>
-  //   );
-  // };
+  const SearchDataDisplay = props => {
+    return (
+      <View>
+        <Text>{props.item.Title}</Text>
+        <Image
+          source={{uri: props.item.Poster}}
+          style={{width: 50, height: 50}}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <TextInput
-            value={text}
-            placeholder="Enter Movie Name"
-            onChangeText={te => {
-              setText(te);
-            }}
-            onSubmitEditing={searchMovie}
-          />
-          <Image
-            source={{uri: data.Poster}}
-            style={{width: 400, height: 500}}
-            resizeMode="contain"
-          />
-          {/* <FlatList
-            data={searchData}
-            renderItem={({item}) => {
-              return <SearchDataDisplay key={item.key} item={item} />;
-            }}
-          /> */}
-        </View>
-      </ScrollView>
+    <SafeAreaView
+      contentInsetAdjustmentBehavior="automatic"
+      style={backgroundStyle}>
+      <Header />
+      <View
+        style={{
+          backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        }}>
+        <TextInput
+          value={text}
+          onChangeText={te => {
+            console.log('te', te);
+            onChangeText(te);
+          }}
+          placeholder="Enter Movie Name"
+          onSubmitEditing={searchMovie}
+        />
+        <Image
+          source={{uri: data.Poster}}
+          style={{width: 400, height: 500}}
+          resizeMode="contain"
+        />
+        <FlatList
+          data={searchData}
+          style={{height: 400, position: 'absolute', top: 50}}
+          renderItem={({item}) => {
+            return <SearchDataDisplay key={item.key} item={item} />;
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 };
